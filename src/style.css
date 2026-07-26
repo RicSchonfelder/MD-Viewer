@@ -125,6 +125,24 @@ body {
   color: var(--accent);
 }
 
+#toolbar-actions select {
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+  -webkit-app-region: no-drag;
+  max-width: 160px;
+}
+
+#toolbar-actions select:hover {
+  border-color: var(--accent);
+}
+
 #content {
   flex: 1;
   overflow-y: auto;

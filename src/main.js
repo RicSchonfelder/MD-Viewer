@@ -1,6 +1,7 @@
 import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import { listen } from '@tauri-apps/api/event';
+import i18n, { applyTranslations, setLocale, getSupportedLocales, onLocaleChanged } from './i18n.js';
 import './style.css';
 import { render, highlightCode } from './renderer.js';
 
@@ -14,6 +15,7 @@ const appTitleEl = document.getElementById('app-title');
 const statusText = document.getElementById('status-text');
 const errorOverlay = document.getElementById('error-overlay');
 const errorMessage = document.getElementById('error-message');
+const langSelect = document.getElementById('btn-lang');
 
 function showError(msg) {
   errorMessage.textContent = msg;
@@ -24,8 +26,8 @@ function hideError() {
   errorOverlay.classList.add('hidden');
 }
 
-function setStatus(msg) {
-  statusText.textContent = msg;
+function setStatus(key, opts) {
+  statusText.textContent = i18n.t(key, opts);
 }
 
 function getFileName(path) {
@@ -37,12 +39,13 @@ function getFileName(path) {
 async function loadFile(filePath) {
   try {
     if (!filePath) return;
-    setStatus(`Loading ${getFileName(filePath)}...`);
+    const fileName = getFileName(filePath);
+    setStatus('status.loading', { filename: fileName });
 
     const content = await invoke('read_file', { path: filePath });
 
     if (content === null || content === undefined) {
-      showError('Failed to read file.');
+      showError(i18n.t('error.failed'));
       return;
     }
 
@@ -51,18 +54,17 @@ async function loadFile(filePath) {
     highlightCode();
 
     currentFilePath = filePath;
-    const fileName = getFileName(filePath);
     filenameEl.textContent = fileName;
-    appTitleEl.textContent = `MD Viewer — ${fileName}`;
+    appTitleEl.textContent = i18n.t('app.title.withFile', { filename: fileName });
 
     welcomeEl.classList.add('hidden');
     viewerEl.classList.remove('hidden');
     hideError();
-    setStatus(`Loaded ${fileName}`);
+    setStatus('status.loaded', { filename: fileName });
   } catch (err) {
     console.error('loadFile error:', err);
-    showError(`Error reading file: ${err}`);
-    setStatus('Error');
+    showError(i18n.t('error.readFile', { error: err }));
+    setStatus('status.error');
   }
 }
 
@@ -70,17 +72,17 @@ async function openFileDialog() {
   try {
     hideError();
     const result = await open({
-      title: 'Open Markdown File',
+      title: i18n.t('dialog.title'),
       filters: [{
-        name: 'Markdown',
-        extensions: ['md', 'mdx', 'markdown']
+        name: i18n.t('dialog.filterName'),
+        extensions: ['md', 'mdx', 'markdown'],
       }],
     });
     if (result) {
       await loadFile(result);
     }
   } catch (err) {
-    showError(`Dialog error: ${err}`);
+    showError(i18n.t('error.dialog', { error: err }));
   }
 }
 
@@ -106,7 +108,6 @@ document.addEventListener('keydown', (e) => {
 });
 
 let dragCounter = 0;
-
 document.addEventListener('dragenter', () => { dragCounter++; });
 document.addEventListener('dragleave', () => { dragCounter--; });
 document.addEventListener('dragover', (e) => e.preventDefault());
@@ -114,15 +115,13 @@ document.addEventListener('dragover', (e) => e.preventDefault());
 document.addEventListener('drop', async (e) => {
   e.preventDefault();
   dragCounter = 0;
-
   const file = e.dataTransfer.files[0];
   if (!file) return;
-
   const name = file.name.toLowerCase();
   if (name.endsWith('.md') || name.endsWith('.mdx') || name.endsWith('.markdown')) {
     await loadFile(file.path);
   } else {
-    showError('Please drop a Markdown (.md) file.');
+    showError(i18n.t('error.notMd'));
   }
 });
 
@@ -145,6 +144,30 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e)
   applyTheme();
 });
 
+getSupportedLocales().forEach((loc) => {
+  const opt = document.createElement('option');
+  opt.value = loc.code;
+  opt.textContent = loc.label;
+  if (loc.code === i18n.language) opt.selected = true;
+  langSelect.appendChild(opt);
+});
+
+langSelect.addEventListener('change', () => {
+  setLocale(langSelect.value);
+});
+
+onLocaleChanged(() => {
+  if (currentFilePath) {
+    const fileName = getFileName(currentFilePath);
+    appTitleEl.textContent = i18n.t('app.title.withFile', { filename: fileName });
+  }
+  getSupportedLocales().forEach((loc) => {
+    const opt = langSelect.querySelector(`option[value="${loc.code}"]`);
+    if (opt) opt.selected = loc.code === i18n.language;
+  });
+});
+
+applyTranslations();
 checkCliArgs();
 
 listen('file-opened', (event) => {
