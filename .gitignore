@@ -1,6 +1,8 @@
 node_modules/
 target/
 doc/
+dist/
+src-tauri/gen/
 *.md~
 *.swp
 .DS_Store
