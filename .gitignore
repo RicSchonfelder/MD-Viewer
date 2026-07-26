@@ -1,0 +1,7 @@
+node_modules/
+target/
+doc/
+*.md~
+*.swp
+.DS_Store
+Thumbs.db
