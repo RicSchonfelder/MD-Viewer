@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
+import { openUrl } from '@tauri-apps/plugin-opener';
 import { listen } from '@tauri-apps/api/event';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import i18n, { applyTranslations, setLocale, getSupportedLocales, onLocaleChanged } from './i18n.js';
@@ -9,13 +10,219 @@ import { render, highlightCode } from './renderer.js';
 const appWindow = getCurrentWindow();
 
 // ─── Title Bar Controls ───
-document.getElementById('titlebar-minimize').addEventListener('click', () => appWindow.minimize());
-document.getElementById('titlebar-maximize').addEventListener('click', async () => {
-  await appWindow.toggleMaximize();
+document.getElementById('titlebar-minimize').addEventListener('click', async () => {
+  try { await appWindow.minimize(); } catch (e) { console.error('minimize:', e); }
 });
-document.getElementById('titlebar-close').addEventListener('click', () => appWindow.close());
+document.getElementById('titlebar-maximize').addEventListener('click', async () => {
+  try { await appWindow.toggleMaximize(); } catch (e) { console.error('maximize:', e); }
+});
+document.getElementById('titlebar-close').addEventListener('click', async () => {
+  try { await appWindow.close(); } catch (e) { console.error('close:', e); }
+});
 
+// ─── Keyboard Shortcuts ───
+document.addEventListener('keydown', async (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+    e.preventDefault();
+    openFileDialog();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'q') {
+    e.preventDefault();
+    try { await appWindow.close(); } catch (e) { console.error('close:', e); }
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+    e.preventDefault();
+    if (viewerEl.classList.contains('hidden')) return;
+    toggleFind();
+    if (findActive) {
+      const findInput = document.getElementById('find-input');
+      setTimeout(() => findInput.select(), 0);
+    }
+  }
+  if (e.key === 'F3' && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault();
+    if (findActive && totalMatches > 0) findNext();
+  }
+  if (e.key === 'F3' && (e.shiftKey)) {
+    e.preventDefault();
+    if (findActive && totalMatches > 0) findPrev();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
+    e.preventDefault();
+    if (findActive && totalMatches > 0) {
+      if (e.shiftKey) findPrev(); else findNext();
+    }
+  }
+});
+
+// ─── Hamburger Menu ───
+const menuBtn = document.getElementById('btn-menu');
+const menuDropdown = document.getElementById('menu-dropdown');
+let menuOpen = false;
+
+function toggleMenu(open) {
+  menuOpen = open !== undefined ? open : !menuOpen;
+  menuDropdown.classList.toggle('hidden', !menuOpen);
+}
+
+menuBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  toggleMenu();
+});
+
+document.addEventListener('click', (e) => {
+  if (menuOpen && !menuDropdown.contains(e.target) && e.target !== menuBtn) {
+    toggleMenu(false);
+  }
+});
+
+document.getElementById('menu-open').addEventListener('click', () => {
+  toggleMenu(false);
+  openFileDialog();
+});
+
+document.getElementById('menu-about').addEventListener('click', () => {
+  toggleMenu(false);
+  showAbout();
+});
+
+document.getElementById('menu-update').addEventListener('click', () => {
+  toggleMenu(false);
+  setStatus('update.checking');
+});
+
+// ─── About ───
+function showAbout() {
+  document.getElementById('about-overlay').classList.remove('hidden');
+}
+
+function hideAbout() {
+  document.getElementById('about-overlay').classList.add('hidden');
+}
+
+document.getElementById('about-close').addEventListener('click', hideAbout);
+document.getElementById('about-overlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) hideAbout();
+});
+document.getElementById('about-github').addEventListener('click', (e) => {
+  e.preventDefault();
+  openUrl('https://github.com/RicSchonfelder/MD-Viewer');
+});
+
+// ─── State ───
 let currentFilePath = null;
+
+// ─── Find in Page ───
+let originalRenderedHtml = '';
+let currentMatchIndex = -1;
+let totalMatches = 0;
+let findActive = false;
+
+function toggleFind(show) {
+  findActive = show !== undefined ? show : !findActive;
+  const findBar = document.getElementById('find-bar');
+  const findInput = document.getElementById('find-input');
+  findBar.classList.toggle('hidden', !findActive);
+  if (findActive) {
+    findInput.value = '';
+    document.getElementById('find-count').textContent = '';
+    findInput.focus();
+    currentMatchIndex = -1;
+    totalMatches = 0;
+    restoreOriginalHtml();
+  } else {
+    restoreOriginalHtml();
+  }
+}
+
+function restoreOriginalHtml() {
+  if (originalRenderedHtml) {
+    renderArea.innerHTML = originalRenderedHtml;
+    highlightCode();
+  }
+}
+
+function findInPage(query) {
+  restoreOriginalHtml();
+  if (!query || query.length === 0) {
+    document.getElementById('find-count').textContent = '';
+    currentMatchIndex = -1;
+    totalMatches = 0;
+    return;
+  }
+
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(escaped, 'gi');
+
+  const walker = document.createTreeWalker(renderArea, NodeFilter.SHOW_TEXT, null, false);
+  const nodes = [];
+  let node;
+  while (node = walker.nextNode()) {
+    regex.lastIndex = 0;
+    if (regex.test(node.textContent)) {
+      nodes.push(node);
+    }
+  }
+
+  for (const textNode of nodes) {
+    const parent = textNode.parentNode;
+    if (!parent) continue;
+    const text = textNode.textContent;
+    regex.lastIndex = 0;
+    const frag = document.createDocumentFragment();
+    let lastIdx = 0;
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIdx) {
+        frag.appendChild(document.createTextNode(text.slice(lastIdx, match.index)));
+      }
+      const mark = document.createElement('mark');
+      mark.className = 'find-match';
+      mark.textContent = match[0];
+      frag.appendChild(mark);
+      lastIdx = regex.lastIndex;
+    }
+    if (lastIdx < text.length) {
+      frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+    }
+    if (frag.childNodes.length > 0) {
+      parent.replaceChild(frag, textNode);
+    }
+  }
+
+  const matches = renderArea.querySelectorAll('mark.find-match');
+  totalMatches = matches.length;
+
+  if (totalMatches > 0) {
+    currentMatchIndex = 0;
+    matches[0].classList.add('find-active');
+    matches[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('find-count').textContent = `${currentMatchIndex + 1} / ${totalMatches}`;
+  } else {
+    currentMatchIndex = -1;
+    document.getElementById('find-count').textContent = `0 / 0`;
+  }
+}
+
+function findNext() {
+  const matches = renderArea.querySelectorAll('mark.find-match');
+  if (matches.length === 0) return;
+  matches.forEach(m => m.classList.remove('find-active'));
+  currentMatchIndex = (currentMatchIndex + 1) % matches.length;
+  matches[currentMatchIndex].classList.add('find-active');
+  matches[currentMatchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('find-count').textContent = `${currentMatchIndex + 1} / ${totalMatches}`;
+}
+
+function findPrev() {
+  const matches = renderArea.querySelectorAll('mark.find-match');
+  if (matches.length === 0) return;
+  matches.forEach(m => m.classList.remove('find-active'));
+  currentMatchIndex = (currentMatchIndex - 1 + matches.length) % matches.length;
+  matches[currentMatchIndex].classList.add('find-active');
+  matches[currentMatchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('find-count').textContent = `${currentMatchIndex + 1} / ${totalMatches}`;
+}
 
 const welcomeEl = document.getElementById('welcome');
 const viewerEl = document.getElementById('viewer');
@@ -26,7 +233,7 @@ const titlebarText = document.getElementById('titlebar-text');
 const statusText = document.getElementById('status-text');
 const errorOverlay = document.getElementById('error-overlay');
 const errorMessage = document.getElementById('error-message');
-const langSelect = document.getElementById('btn-lang');
+const langSelect = document.getElementById('menu-lang');
 
 function showError(msg) {
   errorMessage.textContent = msg;
@@ -61,8 +268,10 @@ async function loadFile(filePath) {
     }
 
     const html = render(content, filePath);
+    originalRenderedHtml = html;
     renderArea.innerHTML = html;
     highlightCode();
+    if (findActive) toggleFind(false);
 
     currentFilePath = filePath;
     toolbarFilename.textContent = fileName;
@@ -109,16 +318,29 @@ async function checkCliArgs() {
   }
 }
 
-document.getElementById('btn-open').addEventListener('click', openFileDialog);
 document.getElementById('btn-error-dismiss').addEventListener('click', hideError);
 
-document.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+// ─── Find Bar Events ───
+document.getElementById('find-input').addEventListener('input', (e) => {
+  findInPage(e.target.value);
+});
+
+document.getElementById('find-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
     e.preventDefault();
-    openFileDialog();
+    if (e.shiftKey) findPrev(); else findNext();
+  }
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    toggleFind(false);
   }
 });
 
+document.getElementById('find-next').addEventListener('click', () => findNext());
+document.getElementById('find-prev').addEventListener('click', () => findPrev());
+document.getElementById('find-close').addEventListener('click', () => toggleFind(false));
+
+// ─── Drag & Drop ───
 let dragCounter = 0;
 document.addEventListener('dragenter', () => { dragCounter++; });
 document.addEventListener('dragleave', () => { dragCounter--; });
@@ -137,25 +359,73 @@ document.addEventListener('drop', async (e) => {
   }
 });
 
-const themeToggle = document.getElementById('btn-theme');
-let darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+// ─── CTRL+Click on links ───
+document.getElementById('render-area').addEventListener('click', (e) => {
+  const link = e.target.closest('a');
+  if (!link) return;
+  if (e.ctrlKey || e.metaKey) {
+    e.preventDefault();
+    const href = link.getAttribute('href');
+    if (href && /^https?:\/\//i.test(href)) {
+      openUrl(href);
+    }
+  }
+});
 
-function applyTheme() {
-  document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+// ─── Theme ───
+const THEMES = [
+  { id: 'light', labelKey: 'theme.light' },
+  { id: 'dark', labelKey: 'theme.dark' },
+  { id: 'solarized-light', labelKey: 'theme.solarizedLight' },
+  { id: 'solarized-dark', labelKey: 'theme.solarizedDark' },
+  { id: 'salmon', labelKey: 'theme.salmon' },
+];
+
+const themeSelect = document.getElementById('menu-theme-select');
+
+function populateThemeSelector() {
+  THEMES.forEach((t) => {
+    const opt = document.createElement('option');
+    opt.value = t.id;
+    opt.textContent = i18n.t(t.labelKey);
+    themeSelect.appendChild(opt);
+  });
 }
 
+function getSavedTheme() {
+  return localStorage.getItem('md-viewer-theme');
+}
+
+function getInitialTheme() {
+  const saved = getSavedTheme();
+  if (saved) return saved;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function applyTheme() {
+  const theme = getSavedTheme() || getInitialTheme();
+  document.documentElement.setAttribute('data-theme', theme);
+  themeSelect.value = theme;
+}
+
+themeSelect.addEventListener('change', () => {
+  const theme = themeSelect.value;
+  localStorage.setItem('md-viewer-theme', theme);
+  document.documentElement.setAttribute('data-theme', theme);
+  toggleMenu(false);
+});
+
+populateThemeSelector();
 applyTheme();
 
-themeToggle.addEventListener('click', () => {
-  darkMode = !darkMode;
-  applyTheme();
+onLocaleChanged(() => {
+  THEMES.forEach((t) => {
+    const opt = themeSelect.querySelector(`option[value="${t.id}"]`);
+    if (opt) opt.textContent = i18n.t(t.labelKey);
+  });
 });
 
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-  darkMode = e.matches;
-  applyTheme();
-});
-
+// ─── Language ───
 getSupportedLocales().forEach((loc) => {
   const opt = document.createElement('option');
   opt.value = loc.code;

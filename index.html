@@ -5,14 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark light" />
   <title data-i18n="app.title">MD Viewer</title>
-  <link rel="icon" type="image/png" href="/src/favicon.png" />
+  <link rel="icon" type="image/svg+xml" href="/src/favicon.svg" />
 </head>
 <body>
   <div id="app">
     <!-- Custom Title Bar -->
     <div id="titlebar" data-tauri-drag-region>
       <div id="titlebar-left" data-tauri-drag-region>
-        <img id="titlebar-icon" src="/src/favicon.png" alt="" data-tauri-drag-region />
+        <svg id="titlebar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-tauri-drag-region>
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
         <span id="titlebar-text" data-i18n="app.title" data-tauri-drag-region>MD Viewer</span>
       </div>
       <div id="titlebar-center" data-tauri-drag-region>
@@ -40,21 +43,73 @@
         <span id="toolbar-filename"></span>
       </div>
       <div id="toolbar-actions">
-        <select id="btn-lang" title="Language"></select>
-        <button id="btn-open" data-i18n="toolbar.open" data-i18n-attrs="title">Open</button>
-        <button id="btn-theme" data-i18n="toolbar.theme" data-i18n-attrs="title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
-        </button>
+        <div id="menu-container">
+          <button id="btn-menu" title="Menu">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+              <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+              <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+            </svg>
+          </button>
+          <div id="menu-dropdown" class="hidden">
+            <button id="menu-open">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span data-i18n="toolbar.open">Open</span>
+              <span class="menu-shortcut">Ctrl+O</span>
+            </button>
+            <label id="menu-theme-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              <select id="menu-theme-select"></select>
+            </label>
+            <div class="menu-divider"></div>
+            <label id="menu-lang-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <select id="menu-lang"></select>
+            </label>
+            <button id="menu-update">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              <span data-i18n="toolbar.update">Update</span>
+            </button>
+            <div class="menu-divider"></div>
+            <button id="menu-about">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span data-i18n="menu.about">About</span>
+            </button>
+          </div>
+        </div>
       </div>
     </header>
+
+    <!-- Find Bar -->
+    <div id="find-bar" class="hidden">
+      <div id="find-bar-left">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="find-input" data-i18n="find.placeholder" data-i18n-attrs="placeholder">
+        <span id="find-count"></span>
+      </div>
+      <div id="find-bar-right">
+        <button class="find-nav-btn" id="find-prev" title="Previous">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="find-nav-btn" id="find-next" title="Next">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="find-nav-btn" id="find-close" title="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
 
     <!-- Content -->
     <main id="content">
       <div id="welcome">
         <div id="welcome-icon">
-          <img src="/src/favicon.png" alt="" width="64" height="64" />
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
         </div>
         <h2 data-i18n="welcome.title">MD Viewer</h2>
         <p><span data-i18n="welcome.drop">Drop a .md file here</span></p>
@@ -70,6 +125,35 @@
         </div>
       </div>
     </main>
+
+    <!-- About Modal -->
+    <div id="about-overlay" class="hidden">
+      <div id="about-box">
+        <div id="about-header">
+          <img src="src-tauri/icons/icon.png" alt="MD Viewer" width="64" height="64"/>
+          <h2>MD Viewer</h2>
+          <p class="about-version" id="about-version">v1.0.0</p>
+        </div>
+        <div id="about-body">
+          <p data-i18n="about.description">A cross-platform Markdown file viewer built with Tauri.</p>
+          <div class="about-info">
+            <span data-i18n="about.tech">Tech Stack</span>
+            <p>Tauri v2 + Rust + Vite + marked + highlight.js</p>
+          </div>
+          <div class="about-info">
+            <span data-i18n="about.license">License</span>
+            <p>MIT</p>
+          </div>
+        </div>
+        <div id="about-footer">
+          <a id="about-github" href="https://github.com/RicSchonfelder/MD-Viewer" target="_blank">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            <span>GitHub</span>
+          </a>
+          <button id="about-close" data-i18n="error.dismiss">OK</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Status Bar -->
     <footer id="statusbar">
