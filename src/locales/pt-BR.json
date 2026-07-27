@@ -42,6 +42,8 @@
   "theme.solarizedLight": "Solarized Claro",
   "theme.solarizedDark": "Solarized Escuro",
   "theme.salmon": "Salmão",
+  "toc.title": "Índice",
+  "toc.toggle": "Mostrar índice",
   "find.placeholder": "Pesquisar na página…",
   "find.count": "{{current}} / {{total}}",
   "find.notFound": "Sem resultados",

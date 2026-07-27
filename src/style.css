@@ -469,27 +469,99 @@ body {
 /* ─── Content ─── */
 #content {
   flex: 1;
-  overflow-y: auto;
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  overflow: hidden;
 }
 
-#content::-webkit-scrollbar {
+#main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative;
+  min-width: 0;
+}
+
+#main-area::-webkit-scrollbar {
   width: 8px;
 }
 
-#content::-webkit-scrollbar-track {
+#main-area::-webkit-scrollbar-track {
   background: var(--scrollbar-track);
 }
 
-#content::-webkit-scrollbar-thumb {
+#main-area::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
-#content::-webkit-scrollbar-thumb:hover {
+#main-area::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+/* ─── Sidebar ─── */
+#sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#toc-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  padding: 0 14px 10px;
+}
+
+#toc-list {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#toc-list a {
+  display: block;
+  padding: 3px 14px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.12s;
+  border-left: 2px solid transparent;
+}
+
+#toc-list a:hover {
+  color: var(--accent);
+  background: var(--accent-muted);
+}
+
+#toc-list a.toc-active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: var(--accent-muted);
+  font-weight: 500;
+}
+
+#toc-list a.toc-h1 { padding-left: 14px; }
+#toc-list a.toc-h2 { padding-left: 28px; }
+#toc-list a.toc-h3 { padding-left: 42px; }
+#toc-list a.toc-h4 { padding-left: 56px; }
+#toc-list a.toc-h5 { padding-left: 70px; }
+#toc-list a.toc-h6 { padding-left: 84px; }
+
+#btn-toc.active {
+  background: var(--accent-muted);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* ─── Welcome Screen ─── */
@@ -915,12 +987,19 @@ body {
   #titlebar,
   #toolbar,
   #find-bar,
+  #sidebar,
   #statusbar,
   #about-overlay,
   #error-overlay,
   #welcome,
   #menu-container {
     display: none !important;
+  }
+
+  #main-area {
+    overflow: visible;
+    display: block;
+    flex: none;
   }
 
   #viewer {

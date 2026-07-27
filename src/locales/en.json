@@ -42,6 +42,8 @@
   "theme.solarizedLight": "Solarized Light",
   "theme.solarizedDark": "Solarized Dark",
   "theme.salmon": "Salmon",
+  "toc.title": "Outline",
+  "toc.toggle": "Toggle outline",
   "find.placeholder": "Find in page…",
   "find.count": "{{current}} / {{total}}",
   "find.notFound": "No results",

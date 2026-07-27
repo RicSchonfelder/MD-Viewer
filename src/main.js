@@ -282,6 +282,7 @@ async function loadFile(filePath) {
     originalRenderedHtml = html;
     renderArea.innerHTML = html;
     highlightCode();
+    buildToc();
     if (findActive) toggleFind(false);
 
     currentFilePath = filePath;
@@ -350,6 +351,69 @@ document.getElementById('find-input').addEventListener('keydown', (e) => {
 document.getElementById('find-next').addEventListener('click', () => findNext());
 document.getElementById('find-prev').addEventListener('click', () => findPrev());
 document.getElementById('find-close').addEventListener('click', () => toggleFind(false));
+
+// ─── Table of Contents ───
+let tocObserver = null;
+
+const sidebarEl = document.getElementById('sidebar');
+const tocList = document.getElementById('toc-list');
+const tocBtn = document.getElementById('btn-toc');
+
+function toggleToc(show) {
+  const isVisible = !sidebarEl.classList.contains('hidden');
+  const open = show !== undefined ? show : !isVisible;
+  sidebarEl.classList.toggle('hidden', !open);
+  tocBtn.classList.toggle('active', open);
+}
+
+tocBtn.addEventListener('click', () => toggleToc());
+
+function buildToc() {
+  tocList.innerHTML = '';
+  if (tocObserver) { tocObserver.disconnect(); tocObserver = null; }
+
+  const headings = renderArea.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]');
+  if (headings.length === 0) return;
+
+  const frag = document.createDocumentFragment();
+  const headingElements = [];
+
+  headings.forEach((h) => {
+    const level = parseInt(h.tagName[1], 10);
+    const id = h.id;
+    const text = h.textContent;
+
+    const a = document.createElement('a');
+    a.href = '#' + id;
+    a.className = 'toc-h' + level;
+    a.textContent = text;
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.getElementById(id);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+    frag.appendChild(a);
+    headingElements.push({ el: a, heading: h });
+  });
+
+  tocList.appendChild(frag);
+
+  tocObserver = new IntersectionObserver((entries) => {
+    let activeId = null;
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) activeId = entry.target.id;
+    });
+    if (activeId) {
+      tocList.querySelectorAll('a').forEach((a) => a.classList.remove('toc-active'));
+      const activeLink = tocList.querySelector(`a[href="#${CSS.escape(activeId)}"]`);
+      if (activeLink) activeLink.classList.add('toc-active');
+    }
+  }, { root: document.getElementById('main-area'), threshold: 0 });
+
+  headingElements.forEach(({ heading }) => tocObserver.observe(heading));
+}
 
 // ─── Drag & Drop ───
 let dragCounter = 0;

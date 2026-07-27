@@ -60,6 +60,15 @@ renderer.image = function ({ href, title, text }) {
   return `<img src="${escapeAttr(src)}" alt="${altAttr}"${titleAttr} loading="lazy" />`;
 };
 
+function slugify(text) {
+  return text.toLowerCase().replace(/[^\w]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+renderer.heading = function ({ text, depth }) {
+  const id = slugify(text);
+  return `<h${depth} id="${id}">${text}</h${depth}>`;
+};
+
 renderer.link = function ({ href, title, text }) {
   const isExternal = /^https?:\/\//i.test(href);
   const titleAttr = title ? ` title="${escapeAttr(title)}"` : '';

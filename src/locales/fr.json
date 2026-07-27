@@ -42,6 +42,8 @@
   "theme.solarizedLight": "Solarized Clair",
   "theme.solarizedDark": "Solarized Sombre",
   "theme.salmon": "Saumon",
+  "toc.title": "Sommaire",
+  "toc.toggle": "Afficher le sommaire",
   "find.placeholder": "Rechercher dans la page…",
   "find.count": "{{current}} / {{total}}",
   "find.notFound": "Aucun résultat",
