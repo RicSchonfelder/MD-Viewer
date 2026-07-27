@@ -13,12 +13,13 @@
     "windows": [
       {
         "title": "MD Viewer",
-        "width": 900,
-        "height": 700,
-        "minWidth": 400,
-        "minHeight": 300,
+        "width": 960,
+        "height": 720,
+        "minWidth": 500,
+        "minHeight": 360,
         "resizable": true,
-        "center": true
+        "center": true,
+        "decorations": false
       }
     ],
     "security": {

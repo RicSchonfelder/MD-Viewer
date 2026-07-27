@@ -1,17 +1,28 @@
 import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import { listen } from '@tauri-apps/api/event';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import i18n, { applyTranslations, setLocale, getSupportedLocales, onLocaleChanged } from './i18n.js';
 import './style.css';
 import { render, highlightCode } from './renderer.js';
+
+const appWindow = getCurrentWindow();
+
+// ─── Title Bar Controls ───
+document.getElementById('titlebar-minimize').addEventListener('click', () => appWindow.minimize());
+document.getElementById('titlebar-maximize').addEventListener('click', async () => {
+  await appWindow.toggleMaximize();
+});
+document.getElementById('titlebar-close').addEventListener('click', () => appWindow.close());
 
 let currentFilePath = null;
 
 const welcomeEl = document.getElementById('welcome');
 const viewerEl = document.getElementById('viewer');
 const renderArea = document.getElementById('render-area');
-const filenameEl = document.getElementById('filename');
-const appTitleEl = document.getElementById('app-title');
+const toolbarFilename = document.getElementById('toolbar-filename');
+const titlebarFilename = document.getElementById('titlebar-filename');
+const titlebarText = document.getElementById('titlebar-text');
 const statusText = document.getElementById('status-text');
 const errorOverlay = document.getElementById('error-overlay');
 const errorMessage = document.getElementById('error-message');
@@ -54,8 +65,9 @@ async function loadFile(filePath) {
     highlightCode();
 
     currentFilePath = filePath;
-    filenameEl.textContent = fileName;
-    appTitleEl.textContent = i18n.t('app.title.withFile', { filename: fileName });
+    toolbarFilename.textContent = fileName;
+    titlebarFilename.textContent = fileName;
+    titlebarText.textContent = 'MD Viewer';
 
     welcomeEl.classList.add('hidden');
     viewerEl.classList.remove('hidden');
@@ -157,10 +169,6 @@ langSelect.addEventListener('change', () => {
 });
 
 onLocaleChanged(() => {
-  if (currentFilePath) {
-    const fileName = getFileName(currentFilePath);
-    appTitleEl.textContent = i18n.t('app.title.withFile', { filename: fileName });
-  }
   getSupportedLocales().forEach((loc) => {
     const opt = langSelect.querySelector(`option[value="${loc.code}"]`);
     if (opt) opt.selected = loc.code === i18n.language;

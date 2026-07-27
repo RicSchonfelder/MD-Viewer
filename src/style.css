@@ -1,49 +1,69 @@
 :root {
   --bg: #ffffff;
-  --bg-secondary: #f6f8fa;
-  --text: #24292f;
-  --text-secondary: #57606a;
-  --border: #d0d7de;
-  --accent: #0969da;
-  --accent-hover: #0550ae;
-  --toolbar-bg: #f6f8fa;
-  --statusbar-bg: #f6f8fa;
-  --code-bg: #f6f8fa;
-  --blockquote-border: #d0d7de;
-  --blockquote-bg: #f6f8fa;
-  --table-border: #d0d7de;
-  --table-alt-bg: #f6f8fa;
-  --kbd-bg: #f6f8fa;
-  --kbd-border: #d0d7de;
-  --welcome-icon: #8b949e;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #eeeeee;
+  --text: #333333;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border: #e0e0e0;
+  --border-subtle: #eeeeee;
+  --accent: #7c6fcd;
+  --accent-hover: #6b5fbd;
+  --accent-muted: rgba(124, 111, 205, 0.08);
+  --titlebar-bg: #f0f0f0;
+  --titlebar-text: #444444;
+  --toolbar-bg: #f8f8f8;
+  --statusbar-bg: #f8f8f8;
+  --code-bg: #f5f5f5;
+  --blockquote-border: #7c6fcd;
+  --blockquote-bg: #f8f6ff;
+  --table-border: #e0e0e0;
+  --table-alt-bg: #f8f8f8;
+  --kbd-bg: #f5f5f5;
+  --kbd-border: #dddddd;
+  --welcome-icon: #cccccc;
   --error-bg: #fff0f0;
-  --error-border: #ffc0c0;
-  --error-text: #d73a49;
-  --scrollbar-thumb: #c1c7cd;
+  --error-border: #ffd0d0;
+  --error-text: #c04040;
+  --scrollbar-thumb: #cccccc;
+  --scrollbar-track: transparent;
+  --control-hover-bg: rgba(0,0,0,0.06);
+  --control-close-hover-bg: #e04040;
+  --control-close-hover-color: #ffffff;
 }
 
 [data-theme="dark"] {
-  --bg: #0d1117;
-  --bg-secondary: #161b22;
-  --text: #e6edf3;
-  --text-secondary: #8b949e;
-  --border: #30363d;
-  --accent: #58a6ff;
-  --accent-hover: #79c0ff;
-  --toolbar-bg: #161b22;
-  --statusbar-bg: #161b22;
-  --code-bg: #161b22;
-  --blockquote-border: #30363d;
-  --blockquote-bg: #161b22;
-  --table-border: #30363d;
-  --table-alt-bg: #161b22;
-  --kbd-bg: #161b22;
-  --kbd-border: #30363d;
-  --welcome-icon: #484f58;
+  --bg: #1e1e1e;
+  --bg-secondary: #252526;
+  --bg-tertiary: #2d2d2d;
+  --text: #d4d4d4;
+  --text-secondary: #969696;
+  --text-muted: #6e6e6e;
+  --border: #3c3c3c;
+  --border-subtle: #333333;
+  --accent: #7c6fcd;
+  --accent-hover: #8b7fd6;
+  --accent-muted: rgba(124, 111, 205, 0.12);
+  --titlebar-bg: #252526;
+  --titlebar-text: #cccccc;
+  --toolbar-bg: #2d2d30;
+  --statusbar-bg: #2d2d30;
+  --code-bg: #2d2d30;
+  --blockquote-border: #7c6fcd;
+  --blockquote-bg: rgba(124, 111, 205, 0.06);
+  --table-border: #3c3c3c;
+  --table-alt-bg: #252526;
+  --kbd-bg: #2d2d30;
+  --kbd-border: #3c3c3c;
+  --welcome-icon: #555555;
   --error-bg: #1c1014;
   --error-border: #382026;
   --error-text: #ff7b72;
-  --scrollbar-thumb: #30363d;
+  --scrollbar-thumb: #444444;
+  --scrollbar-track: transparent;
+  --control-hover-bg: rgba(255,255,255,0.08);
+  --control-close-hover-bg: #e04040;
+  --control-close-hover-color: #ffffff;
 }
 
 * {
@@ -53,12 +73,14 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, Oxygen, Ubuntu, sans-serif;
   background: var(--bg);
   color: var(--text);
   height: 100vh;
   overflow: hidden;
   user-select: none;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 #app {
@@ -67,56 +89,141 @@ body {
   height: 100vh;
 }
 
+/* ─── Custom Title Bar ─── */
+#titlebar {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  background: var(--titlebar-bg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+}
+
+#titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 14px;
+  -webkit-app-region: drag;
+  min-width: 0;
+}
+
+#titlebar-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+}
+
+#titlebar-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--titlebar-text);
+  white-space: nowrap;
+  -webkit-app-region: drag;
+}
+
+#titlebar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-app-region: drag;
+  min-width: 0;
+}
+
+#titlebar-filename {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+  -webkit-app-region: drag;
+}
+
+#titlebar-controls {
+  display: flex;
+  align-items: center;
+  -webkit-app-region: no-drag;
+  height: 100%;
+}
+
+.titlebar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--titlebar-text);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.titlebar-btn:hover {
+  background: var(--control-hover-bg);
+}
+
+.titlebar-btn:active {
+  opacity: 0.7;
+}
+
+.titlebar-close:hover {
+  background: var(--control-close-hover-bg);
+  color: var(--control-close-hover-color);
+}
+
+/* ─── Toolbar ─── */
 #toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 6px 12px;
   background: var(--toolbar-bg);
-  border-bottom: 1px solid var(--border);
-  -webkit-app-region: drag;
-  user-select: none;
-  min-height: 48px;
+  border-bottom: 1px solid var(--border-subtle);
+  min-height: 40px;
+  flex-shrink: 0;
 }
 
-#title-group {
+#toolbar-left {
   display: flex;
   align-items: center;
-  gap: 12px;
-  -webkit-app-region: drag;
+  gap: 8px;
+  min-width: 0;
 }
 
-#app-title {
-  font-size: 14px;
-  font-weight: 600;
+#toolbar-filename {
+  font-size: 13px;
+  font-weight: 500;
   color: var(--text);
-}
-
-#filename {
-  font-size: 12px;
-  color: var(--text-secondary);
-  max-width: 400px;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 #toolbar-actions {
   display: flex;
+  align-items: center;
   gap: 6px;
-  -webkit-app-region: no-drag;
+  flex-shrink: 0;
 }
 
 #toolbar-actions button {
-  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
   font-size: 12px;
   font-weight: 500;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
   background: var(--bg);
-  color: var(--text);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: all 0.15s;
+  line-height: 1;
 }
 
 #toolbar-actions button:hover {
@@ -126,23 +233,24 @@ body {
 }
 
 #toolbar-actions select {
-  padding: 6px 10px;
+  padding: 5px 8px;
+  padding-right: 4px;
   font-size: 12px;
-  font-weight: 500;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  font-weight: 400;
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
   background: var(--bg);
-  color: var(--text);
+  color: var(--text-secondary);
   cursor: pointer;
   outline: none;
-  -webkit-app-region: no-drag;
-  max-width: 160px;
+  max-width: 140px;
 }
 
 #toolbar-actions select:hover {
   border-color: var(--accent);
 }
 
+/* ─── Content ─── */
 #content {
   flex: 1;
   overflow-y: auto;
@@ -155,52 +263,65 @@ body {
   width: 8px;
 }
 
+#content::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
 #content::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
+#content::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ─── Welcome Screen ─── */
 #welcome {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   flex: 1;
-  gap: 12px;
+  gap: 10px;
   color: var(--text-secondary);
+  padding: 40px;
 }
 
 #welcome-icon {
   color: var(--welcome-icon);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  opacity: 0.6;
 }
 
 #welcome h2 {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--text);
 }
 
 #welcome p {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 #welcome kbd {
-  padding: 2px 6px;
+  padding: 2px 7px;
   font-size: 11px;
   font-family: inherit;
   background: var(--kbd-bg);
   border: 1px solid var(--kbd-border);
   border-radius: 4px;
+  font-weight: 500;
 }
 
 #welcome code {
   font-size: 13px;
-  padding: 2px 6px;
+  padding: 2px 7px;
   background: var(--code-bg);
   border-radius: 4px;
 }
 
+/* ─── Viewer ─── */
 #viewer {
   flex: 1;
   display: flex;
@@ -209,8 +330,8 @@ body {
 
 #render-area {
   flex: 1;
-  padding: 32px 40px;
-  max-width: 900px;
+  padding: 40px 48px;
+  max-width: 800px;
   margin: 0 auto;
   width: 100%;
   user-select: text;
@@ -220,59 +341,69 @@ body {
   display: none !important;
 }
 
+/* ─── Error Overlay ─── */
 #error-overlay {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.35);
   z-index: 100;
 }
 
 #error-box {
   background: var(--error-bg);
   border: 1px solid var(--error-border);
-  border-radius: 8px;
-  padding: 24px 32px;
-  max-width: 500px;
+  border-radius: 10px;
+  padding: 28px 36px;
+  max-width: 480px;
   text-align: center;
 }
 
 #error-message {
   color: var(--error-text);
   font-size: 14px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+  line-height: 1.5;
 }
 
 #btn-error-dismiss {
-  padding: 6px 20px;
+  padding: 7px 24px;
   font-size: 13px;
+  font-weight: 500;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg);
   color: var(--text);
   cursor: pointer;
+  transition: all 0.15s;
 }
 
 #btn-error-dismiss:hover {
-  background: var(--bg-secondary);
+  background: var(--accent-muted);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
+/* ─── Status Bar ─── */
 #statusbar {
-  padding: 4px 16px;
+  padding: 3px 14px;
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   background: var(--statusbar-bg);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-subtle);
   min-height: 24px;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
+/* ─── Markdown Content ─── */
 .markdown-body {
-  line-height: 1.7;
+  line-height: 1.75;
   word-wrap: break-word;
+  font-size: 15px;
 }
 
 .markdown-body h1,
@@ -281,27 +412,27 @@ body {
 .markdown-body h4,
 .markdown-body h5,
 .markdown-body h6 {
-  margin-top: 24px;
-  margin-bottom: 16px;
+  margin-top: 28px;
+  margin-bottom: 12px;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.3;
   color: var(--text);
 }
 
-.markdown-body h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-.markdown-body h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+.markdown-body h1 { font-size: 1.8em; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px; }
+.markdown-body h2 { font-size: 1.5em; border-bottom: 1px solid var(--border-subtle); padding-bottom: 6px; }
 .markdown-body h3 { font-size: 1.25em; }
-.markdown-body h4 { font-size: 1em; }
+.markdown-body h4 { font-size: 1.05em; }
 
 .markdown-body p,
 .markdown-body ul,
 .markdown-body ol {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .markdown-body ul,
 .markdown-body ol {
-  padding-left: 2em;
+  padding-left: 1.8em;
 }
 
 .markdown-body li {
@@ -311,6 +442,7 @@ body {
 .markdown-body a {
   color: var(--accent);
   text-decoration: none;
+  font-weight: 500;
 }
 
 .markdown-body a:hover {
@@ -318,11 +450,11 @@ body {
 }
 
 .markdown-body blockquote {
-  padding: 8px 16px;
-  margin: 0 0 16px;
-  border-left: 4px solid var(--blockquote-border);
+  padding: 10px 20px;
+  margin: 0 0 18px;
+  border-left: 3px solid var(--blockquote-border);
   background: var(--blockquote-bg);
-  border-radius: 4px;
+  border-radius: 0 6px 6px 0;
 }
 
 .markdown-body blockquote p:last-child {
@@ -330,38 +462,39 @@ body {
 }
 
 .markdown-body code {
-  padding: 2px 6px;
-  font-size: 85%;
+  padding: 2px 7px;
+  font-size: 0.88em;
   background: var(--code-bg);
   border-radius: 4px;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-family: "SF Mono", "Fira Code", "Cascadia Code", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
 .markdown-body pre {
-  padding: 16px;
-  margin-bottom: 16px;
+  padding: 16px 20px;
+  margin-bottom: 18px;
   background: var(--code-bg);
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
   overflow-x: auto;
 }
 
 .markdown-body pre code {
   padding: 0;
   background: none;
-  font-size: 85%;
-  line-height: 1.5;
+  font-size: 0.85em;
+  line-height: 1.6;
 }
 
 .markdown-body table {
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   border-collapse: collapse;
+  font-size: 0.93em;
 }
 
 .markdown-body th,
 .markdown-body td {
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: 1px solid var(--table-border);
   text-align: left;
 }
@@ -379,40 +512,51 @@ body {
   height: 1px;
   background: var(--border);
   border: none;
-  margin: 24px 0;
+  margin: 28px 0;
 }
 
 .markdown-body img {
   max-width: 100%;
-  border-radius: 6px;
-  margin: 8px 0;
+  border-radius: 8px;
+  margin: 12px 0;
 }
 
 .markdown-body video {
   max-width: 100%;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .markdown-body input[type="checkbox"] {
   margin-right: 6px;
+  accent-color: var(--accent);
 }
 
 .markdown-body details {
-  margin-bottom: 16px;
-  padding: 8px 16px;
+  margin-bottom: 18px;
+  padding: 10px 18px;
   background: var(--bg-secondary);
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
 }
 
 .markdown-body summary {
   font-weight: 600;
   cursor: pointer;
+  color: var(--text);
 }
 
 .markdown-body p > code,
 .markdown-body li > code {
   background: var(--code-bg);
+}
+
+.markdown-body del {
+  color: var(--text-muted);
+}
+
+.markdown-body .task-list-item {
+  list-style: none;
+  margin-left: -1.8em;
 }
 
 .hljs {
