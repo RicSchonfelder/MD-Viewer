@@ -898,6 +898,96 @@ body {
   margin-left: -1.8em;
 }
 
+/* ─── Print ─── */
+@media print {
+  html, body {
+    height: auto;
+    overflow: visible;
+    background: white;
+    color: black;
+  }
+
+  #app {
+    height: auto;
+    display: block;
+  }
+
+  #titlebar,
+  #toolbar,
+  #find-bar,
+  #statusbar,
+  #about-overlay,
+  #error-overlay,
+  #welcome,
+  #menu-container {
+    display: none !important;
+  }
+
+  #viewer {
+    display: block !important;
+    flex: none;
+  }
+
+  #render-area {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+    user-select: text;
+    color: black;
+  }
+
+  #render-area a {
+    color: #1a73e8;
+    text-decoration: underline;
+  }
+
+  #render-area code,
+  #render-area pre {
+    background: #f5f5f5 !important;
+    color: black !important;
+    border: 1px solid #ddd;
+    page-break-inside: avoid;
+  }
+
+  #render-area pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  #render-area img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  #render-area h1,
+  #render-area h2,
+  #render-area h3,
+  #render-area h4 {
+    page-break-after: avoid;
+    color: black;
+  }
+
+  #render-area table {
+    page-break-inside: avoid;
+  }
+
+  #render-area blockquote {
+    border-left-color: #999;
+    background: #f9f9f9;
+    color: #333;
+  }
+
+  #render-area .find-match,
+  #render-area mark.find-match {
+    background: none !important;
+    padding: 0 !important;
+  }
+
+  @page {
+    margin: 2cm;
+  }
+}
+
 .hljs {
   background: transparent !important;
   padding: 0 !important;

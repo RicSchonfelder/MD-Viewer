@@ -24,6 +24,8 @@
   "language.pt-BR": "Português (Brasil)",
   "language.es": "Español",
   "language.fr": "Français",
+  "toolbar.print": "Print",
+  "toolbar.printTooltip": "Print or save as PDF (Ctrl+P)",
   "toolbar.update": "Update",
   "toolbar.updateTooltip": "Check for updates",
   "update.title": "Update Available",

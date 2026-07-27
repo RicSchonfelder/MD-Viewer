@@ -30,6 +30,11 @@ document.addEventListener('keydown', async (e) => {
     e.preventDefault();
     try { await appWindow.close(); } catch (e) { console.error('close:', e); }
   }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+    e.preventDefault();
+    if (viewerEl.classList.contains('hidden')) return;
+    window.print();
+  }
   if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
     e.preventDefault();
     if (viewerEl.classList.contains('hidden')) return;
@@ -89,6 +94,12 @@ document.getElementById('menu-about').addEventListener('click', () => {
 document.getElementById('menu-update').addEventListener('click', () => {
   toggleMenu(false);
   setStatus('update.checking');
+});
+
+document.getElementById('menu-print').addEventListener('click', () => {
+  toggleMenu(false);
+  if (viewerEl.classList.contains('hidden')) return;
+  window.print();
 });
 
 // ─── About ───
