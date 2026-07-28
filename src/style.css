@@ -1,5 +1,6 @@
 [data-theme="light"],
 :root {
+  --content-font-size: 15px;
   --bg: #ffffff;
   --bg-secondary: #f5f5f5;
   --bg-tertiary: #eeeeee;
@@ -466,6 +467,61 @@ body {
   outline: none;
 }
 
+#menu-zoom-label {
+  cursor: default;
+  padding: 4px 10px;
+}
+
+#menu-zoom-label svg {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+#zoom-controls {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+#zoom-controls button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 24px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1;
+  transition: all 0.12s;
+  padding: 0;
+}
+
+#zoom-controls button:hover {
+  background: var(--accent-muted);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+#zoom-controls button:active {
+  opacity: 0.6;
+}
+
+#zoom-level {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 36px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ─── Content ─── */
 #content {
   flex: 1;
@@ -814,7 +870,7 @@ body {
 .markdown-body {
   line-height: 1.75;
   word-wrap: break-word;
-  font-size: 15px;
+  font-size: var(--content-font-size);
 }
 
 .markdown-body h1,

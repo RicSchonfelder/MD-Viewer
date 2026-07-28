@@ -1,11 +1,12 @@
 import { invoke } from '@tauri-apps/api/core';
-import { open } from '@tauri-apps/plugin-dialog';
+import { open, message, confirm } from '@tauri-apps/plugin-dialog';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { listen } from '@tauri-apps/api/event';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import i18n, { applyTranslations, setLocale, getSupportedLocales, onLocaleChanged } from './i18n.js';
 import './style.css';
 import { render, highlightCode } from './renderer.js';
+import { checkForUpdates, installUpdate } from './updater.js';
 
 const appWindow = getCurrentWindow();
 
@@ -58,6 +59,18 @@ document.addEventListener('keydown', async (e) => {
       if (e.shiftKey) findPrev(); else findNext();
     }
   }
+  if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) {
+    e.preventDefault();
+    zoomIn();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === '-') {
+    e.preventDefault();
+    zoomOut();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === '0') {
+    e.preventDefault();
+    zoomReset();
+  }
 });
 
 // ─── Hamburger Menu ───
@@ -91,9 +104,27 @@ document.getElementById('menu-about').addEventListener('click', () => {
   showAbout();
 });
 
-document.getElementById('menu-update').addEventListener('click', () => {
+document.getElementById('menu-update').addEventListener('click', async () => {
   toggleMenu(false);
   setStatus('update.checking');
+  const result = await checkForUpdates(true);
+  if (result.available) {
+    const shouldUpdate = await confirm(result.message, {
+      title: i18n.t('update.title'),
+      kind: 'info',
+      okLabel: i18n.t('update.update'),
+      cancelLabel: i18n.t('update.later'),
+    });
+    if (shouldUpdate) {
+      await installUpdate(result.htmlUrl);
+    }
+  } else {
+    await message(result.message, {
+      title: 'MD Viewer',
+      kind: 'info',
+    });
+  }
+  setStatus('status.ready');
 });
 
 document.getElementById('menu-print').addEventListener('click', () => {
@@ -414,6 +445,43 @@ function buildToc() {
 
   headingElements.forEach(({ heading }) => tocObserver.observe(heading));
 }
+
+// ─── Font Size / Zoom ───
+const ZOOM_MIN = 12;
+const ZOOM_MAX = 24;
+const ZOOM_DEFAULT = 15;
+
+let zoomLevel = ZOOM_DEFAULT;
+
+function getSavedZoom() {
+  const saved = localStorage.getItem('md-viewer-zoom');
+  return saved ? parseInt(saved, 10) : ZOOM_DEFAULT;
+}
+
+function applyZoom() {
+  document.documentElement.style.setProperty('--content-font-size', zoomLevel + 'px');
+  document.getElementById('zoom-level').textContent = Math.round((zoomLevel / ZOOM_DEFAULT) * 100) + '%';
+  localStorage.setItem('md-viewer-zoom', String(zoomLevel));
+}
+
+function zoomIn() {
+  if (zoomLevel < ZOOM_MAX) { zoomLevel++; applyZoom(); }
+}
+
+function zoomOut() {
+  if (zoomLevel > ZOOM_MIN) { zoomLevel--; applyZoom(); }
+}
+
+function zoomReset() {
+  zoomLevel = ZOOM_DEFAULT; applyZoom();
+}
+
+zoomLevel = getSavedZoom();
+applyZoom();
+
+document.getElementById('zoom-in').addEventListener('click', () => { toggleMenu(false); zoomIn(); });
+document.getElementById('zoom-out').addEventListener('click', () => { toggleMenu(false); zoomOut(); });
+document.getElementById('zoom-reset').addEventListener('click', () => { toggleMenu(false); zoomReset(); });
 
 // ─── Drag & Drop ───
 let dragCounter = 0;
