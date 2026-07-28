@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # MD Viewer installer for Windows
-# Usage: irm https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/main/install.ps1 | iex
+# Usage: irm https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/master/install.ps1 | iex
 
 $Repo = "RicSchonfelder/MD-Viewer"
 $ApiUrl = "https://api.github.com/repos/$Repo/releases/latest"

@@ -61,12 +61,12 @@ Get the latest installer from the [Releases page](https://github.com/RicSchonfel
 
 **Windows (PowerShell):**
 ```powershell
-irm https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/master/install.ps1 | iex
 ```
 
 **macOS / Linux:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/master/install.sh | bash
 ```
 
 ## Usage

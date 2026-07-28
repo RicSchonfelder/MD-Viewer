@@ -1,6 +1,6 @@
 #!/bin/bash
 # MD Viewer installer for macOS and Linux
-# Usage: curl -fsSL https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/main/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/master/install.sh | bash
 
 set -e
 
