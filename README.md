@@ -57,6 +57,18 @@ Get the latest installer from the [Releases page](https://github.com/RicSchonfel
 
 **Linux:** Make the `.AppImage` executable (`chmod +x`) and run, or install the `.deb` package with `sudo dpkg -i`.
 
+### One-liner install
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/main/install.ps1 | iex
+```
+
+**macOS / Linux:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/main/install.sh | bash
+```
+
 ## Usage
 
 | Action | How |
