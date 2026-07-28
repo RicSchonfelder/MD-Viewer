@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "description": "A cross-platform Markdown file viewer - read-only, no editing",
   "type": "module",
+  "bin": {
+    "mdviewer": "./cli/index.js"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -22,6 +25,7 @@
     "@tauri-apps/plugin-opener": "^2.5.4",
     "@tauri-apps/plugin-process": "^2.3.1",
     "@tauri-apps/plugin-updater": "^2.10.1",
+    "chalk": "^5.6.2",
     "highlight.js": "^11",
     "i18next": "^26.3.6",
     "marked": "^15"
