@@ -1,6 +1,7 @@
 {
   "app.title": "MD Viewer",
   "app.title.withFile": "MD Viewer — {{filename}}",
+  "toolbar.find": "Localizar",
   "toolbar.open": "Abrir",
   "toolbar.theme": "Tema",
   "toolbar.language": "Idioma",
@@ -36,6 +37,8 @@
   "update.later": "Depois",
   "update.restart": "Reiniciar agora para aplicar a atualização?",
   "update.restartNow": "Reiniciar",
+  "update.installed": "Atualização baixada. O instalador será executado.\nO aplicativo fechará automaticamente.",
+  "update.downloadFailed": "Falha ao baixar atualização.",
   "update.checking": "Verificando atualizações...",
   "theme.light": "Claro",
   "theme.dark": "Escuro",

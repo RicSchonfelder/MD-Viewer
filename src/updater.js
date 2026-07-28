@@ -1,4 +1,5 @@
-import { openUrl } from '@tauri-apps/plugin-opener';
+import { invoke } from '@tauri-apps/api/core';
+import { confirm, message } from '@tauri-apps/plugin-dialog';
 import i18n from './i18n.js';
 
 const REPO = 'RicSchonfelder/MD-Viewer';
@@ -32,7 +33,8 @@ async function checkForUpdates(notifyUpToDate = false) {
       available,
       latestVersion: latestTag,
       currentVersion: current,
-      htmlUrl: data.html_url,
+      latestUrl: data.html_url,
+      assets: data.assets,
       message: available
         ? i18n.t('update.available', { version: latestTag, current })
         : i18n.t('update.upToDate'),
@@ -47,8 +49,42 @@ async function checkForUpdates(notifyUpToDate = false) {
   }
 }
 
-async function installUpdate(url) {
-  await openUrl(url);
+async function installUpdate(result) {
+  const assets = result.assets || [];
+  const nsisAsset = assets.find(a =>
+    a.name.endsWith('-setup.exe') || a.name.endsWith('x64-setup.exe')
+  );
+
+  if (nsisAsset) {
+    const downloadUrl = nsisAsset.browser_download_url;
+
+    const shouldUpdate = await confirm(
+      i18n.t('update.available', { version: result.latestVersion, current: result.currentVersion }),
+      {
+        title: i18n.t('update.title'),
+        kind: 'info',
+        okLabel: i18n.t('update.update'),
+        cancelLabel: i18n.t('update.later'),
+      }
+    );
+
+    if (!shouldUpdate) return;
+
+    try {
+      await invoke('download_and_install', { url: downloadUrl });
+      await message(i18n.t('update.installed'), { title: 'MD Viewer', kind: 'info' });
+      const { getCurrentWindow } = await import('@tauri-apps/api/window');
+      await getCurrentWindow().close();
+    } catch (err) {
+      console.error('Auto-update failed:', err);
+      await message(i18n.t('update.downloadFailed') + '\n' + err, {
+        title: 'MD Viewer', kind: 'error',
+      });
+    }
+  } else {
+    const { openUrl } = await import('@tauri-apps/plugin-opener');
+    await openUrl(result.latestUrl);
+  }
 }
 
 export { checkForUpdates, installUpdate };

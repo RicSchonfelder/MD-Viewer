@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import { open, message, confirm } from '@tauri-apps/plugin-dialog';
+import { open, message } from '@tauri-apps/plugin-dialog';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { listen } from '@tauri-apps/api/event';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -99,6 +99,15 @@ document.getElementById('menu-open').addEventListener('click', () => {
   openFileDialog();
 });
 
+document.getElementById('menu-find').addEventListener('click', () => {
+  toggleMenu(false);
+  if (viewerEl.classList.contains('hidden')) return;
+  toggleFind();
+  if (findActive) {
+    setTimeout(() => document.getElementById('find-input').select(), 0);
+  }
+});
+
 document.getElementById('menu-about').addEventListener('click', () => {
   toggleMenu(false);
   showAbout();
@@ -109,15 +118,7 @@ document.getElementById('menu-update').addEventListener('click', async () => {
   setStatus('update.checking');
   const result = await checkForUpdates(true);
   if (result.available) {
-    const shouldUpdate = await confirm(result.message, {
-      title: i18n.t('update.title'),
-      kind: 'info',
-      okLabel: i18n.t('update.update'),
-      cancelLabel: i18n.t('update.later'),
-    });
-    if (shouldUpdate) {
-      await installUpdate(result.htmlUrl);
-    }
+    await installUpdate(result);
   } else {
     await message(result.message, {
       title: 'MD Viewer',
