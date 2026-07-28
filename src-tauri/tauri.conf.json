@@ -49,8 +49,7 @@
       "wix": null,
       "nsis": {
         "installMode": "currentUser"
-      },
-      "signCommand": "signtool sign /fd SHA256 /a /f $APPROOT\\md-viewer.pfx /p mdviewer123 $FilePath"
+      }
     },
     "macOS": {
       "frameworks": [],

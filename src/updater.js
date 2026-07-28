@@ -7,6 +7,10 @@ const CURRENT_VERSION = '1.0.0';
 async function checkForUpdates(notifyUpToDate = false) {
   try {
     const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
+
+    if (res.status === 404) {
+      return { available: false, message: i18n.t('update.upToDate') };
+    }
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const data = await res.json();
