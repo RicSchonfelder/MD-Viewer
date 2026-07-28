@@ -2,6 +2,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import process from 'node:process';
+import * as readline from 'node:readline';
 import { marked } from 'marked';
 import chalk from 'chalk';
 import hljs from 'highlight.js';
@@ -277,6 +278,8 @@ let scrollPos = 0;
 let searchQuery = '';
 let isSearching = false;
 let statusMsg = '';
+let savedFilename = '';
+let tuiRunning = false;
 
 function render() {
   const cols = process.stdout.columns || 80;
@@ -287,119 +290,108 @@ function render() {
     scrollPos = Math.max(0, contentLines.length - contentRows);
   }
 
-  const output = [];
+  const header = C.title(` MD Viewer `) + C.dim(savedFilename);
+  const visibleLines = contentLines.slice(scrollPos, scrollPos + contentRows);
+  const lines = [];
 
-  output.push(C.headerBorder('┌') + C.title(` MD Viewer `) + C.dim(filename) + C.headerBorder(' '.repeat(Math.max(1, cols - renderWidth(` MD Viewer ${filename}`) - 5)) + '┐'));
-
-  let visibleLines = contentLines.slice(scrollPos, scrollPos + contentRows);
   for (let i = 0; i < contentRows; i++) {
     const line = visibleLines[i];
-    const lineNum = scrollPos + i + 1;
-    const numStr = C.number(String(lineNum).padStart(4, ' '));
-
     if (!line) {
-      output.push(C.headerBorder('│') + ' '.repeat(cols - 2) + C.headerBorder('│'));
+      lines.push('');
       continue;
     }
 
-    const isCurrentSearch = searchResults.includes(scrollPos + i);
     let text = line.text;
-    if (isCurrentSearch && searchQuery) {
+    if (searchResults.includes(scrollPos + i) && searchQuery) {
       const clean = text.replace(/\x1b\[[0-9;]*m/g, '');
       const idx = clean.toLowerCase().indexOf(searchQuery.toLowerCase());
       if (idx !== -1) {
-        const before = text.slice(0, idx);
-        const match = text.slice(idx, idx + searchQuery.length);
-        const after = text.slice(idx + searchQuery.length);
-        text = before + chalk.inverse(match) + after;
+        text = text.slice(0, idx) + chalk.inverse(text.slice(idx, idx + searchQuery.length)) + text.slice(idx + searchQuery.length);
       }
     }
-
-    const padded = padLine(text, cols - 7);
-    output.push(C.headerBorder('│') + ' ' + padded + ' ' + C.headerBorder('│'));
+    lines.push(text.slice(0, cols - 2));
   }
 
-  let footer = '';
+  let status = '';
   if (statusMsg) {
-    footer = C.warn(` ${statusMsg} `);
+    status = ' ' + statusMsg + ' ';
     statusMsg = '';
   } else if (isSearching) {
     const total = searchResults.length;
-    const idx = currentSearchIdx + 1;
-    const pos = total > 0 ? ` ${idx}/${total}` : ' no matches';
-    footer = C.headerBorder('├') + chalk.bold(` /${searchQuery}${pos} `);
+    const pos = total > 0 ? ` ${currentSearchIdx + 1}/${total}` : ' 0/0';
+    status = ` /${searchQuery}${pos} `;
   } else {
-    const total = contentLines.length;
-    const pct = total > 0 ? Math.round((scrollPos / Math.max(1, total - contentRows)) * 100) : 0;
-    const sr = searchResults.length > 0 ? `  ${searchResults.indexOf(scrollPos) + 1}/${searchResults.length}` : '';
-    footer = C.headerBorder('├') + C.dim(` ↑↓ scroll  / search  q quit  g/G top/bottom${sr}`);
+    const pct = contentLines.length > 0 ? Math.round((scrollPos / Math.max(1, contentLines.length - contentRows)) * 100) : 0;
+    status = ` ↑↓/j k  /search  g/G  q ${pct}%`;
   }
 
-  const footerPadded = padLine(footer, cols - 1);
-  output.push(footerPadded.slice(0, cols));
-  output.push(C.headerBorder('└' + '─'.repeat(cols - 2) + '┘'));
-
-  process.stdout.write('\x1b[?25l');
-  process.stdout.write('\x1b[0;0H' + output.join('\n'));
+  try {
+    console.clear();
+    console.log(header);
+    for (const l of lines) console.log(l);
+    console.log(chalk.dim(status));
+  } catch {}
 }
 
-function handleInput(key) {
+function keypressHandler(str, key) {
+  if (!tuiRunning) return;
   const cols = process.stdout.columns || 80;
   const rows = process.stdout.rows || 24;
   const contentRows = rows - 3;
 
   if (isSearching) {
-    if (key === '\x1b' || key === '\x03') {
+    if (key.name === 'escape' || (key.name === 'c' && key.ctrl)) {
       isSearching = false;
       searchQuery = '';
       searchResults = [];
       currentSearchIdx = -1;
-    } else if (key === '\r' || key === '\n') {
+    } else if (key.name === 'return' || key.name === 'enter') {
       isSearching = false;
       if (searchResults.length > 0) {
         scrollPos = searchResults[0];
       } else {
         statusMsg = 'No matches';
       }
-    } else if (key === '\x7f' || key === '\b') {
+    } else if (key.name === 'backspace') {
       searchQuery = searchQuery.slice(0, -1);
       findMatches(searchQuery);
-    } else if (key.length === 1) {
-      searchQuery += key;
+    } else if (str && str.length === 1 && !key.ctrl) {
+      searchQuery += str;
       findMatches(searchQuery);
     }
+    render();
     return;
   }
 
-  switch (key) {
+  switch (key.name) {
     case 'q':
-    case '\x03':
+    case 'escape':
       cleanup();
       process.exit(0);
       break;
-    case '\x1b[A':
+    case 'up':
     case 'k':
       scrollPos = Math.max(0, scrollPos - 1);
       break;
-    case '\x1b[B':
+    case 'down':
     case 'j':
       scrollPos = Math.min(contentLines.length - contentRows, scrollPos + 1);
       break;
-    case '\x1b[5~':
+    case 'pageup':
       scrollPos = Math.max(0, scrollPos - contentRows);
       break;
-    case '\x1b[6~':
+    case 'pagedown':
       scrollPos = Math.min(contentLines.length - contentRows, scrollPos + contentRows);
       break;
-    case '\x1b[7~':
+    case 'home':
     case 'g':
       scrollPos = 0;
       break;
-    case '\x1b[8~':
+    case 'end':
     case 'G':
       scrollPos = Math.max(0, contentLines.length - contentRows);
       break;
-    case '/':
+    case 'slash':
       isSearching = true;
       searchQuery = '';
       searchResults = [];
@@ -411,79 +403,60 @@ function handleInput(key) {
         scrollPos = searchResults[currentSearchIdx];
       }
       break;
-    case 'N':
-      if (searchResults.length > 0) {
+    case 'p':
+      if (key.shift && searchResults.length > 0) {
         currentSearchIdx = (currentSearchIdx - 1 + searchResults.length) % searchResults.length;
         scrollPos = searchResults[currentSearchIdx];
       }
       break;
-    case '\x1b[H': // Home
-      scrollPos = 0;
-      break;
-    case '\x1b[F': // End
-      scrollPos = Math.max(0, contentLines.length - contentRows);
-      break;
     case '?':
       statusMsg = '↑↓/j k scroll  PgUp/PgDn page  g top  G bottom  / search  n/N next/prev  q quit';
       break;
+    case 'c':
+      if (key.ctrl) { cleanup(); process.exit(0); }
+      break;
   }
+  render();
 }
 
 function cleanup() {
-  process.stdout.write('\x1b[?25h\x1b[0m\x1b[2J\x1b[0;0H');
-  if (process.stdin.isRaw) {
-    try { process.stdin.setRawMode(false); } catch {}
-  }
-  process.stdin.removeAllListeners('data');
+  try {
+    tuiRunning = false;
+    if (process.stdin.isRaw) {
+      process.stdin.setRawMode(false);
+    }
+    process.stdin.removeAllListeners('keypress');
+    process.stdin.pause();
+    console.clear();
+  } catch {}
 }
 
 function startTui() {
-  process.stdout.write('\x1b[?1049h');
-  process.stdout.write('\x1b[2J');
+  try {
+    tuiRunning = true;
+    savedFilename = filename;
 
-  if (process.stdin.isTTY) {
-    process.stdin.setRawMode(true);
-  }
-  process.stdin.resume();
-  process.stdin.setEncoding('utf-8');
-
-  let buffer = '';
-  process.stdin.on('data', (data) => {
-    buffer += data;
-
-    if (buffer === '\x1b') {
-      setTimeout(() => {
-        if (buffer === '\x1b') {
-          handleInput('\x1b');
-          render();
-        }
-        buffer = '';
-      }, 50);
-      return;
-    }
-
-    if (buffer.startsWith('\x1b[')) {
-      if (/^(\x1b\[[0-9;~]*[A-Za-z~])$/.test(buffer)) {
-        handleInput(buffer);
-        buffer = '';
-        render();
+    if (!process.stdin.isTTY || !process.stdout.isTTY) {
+      for (const line of contentLines) {
+        const clean = line.text.replace(/\x1b\[[0-9;]*m/g, '');
+        console.log(clean);
       }
       return;
     }
 
-    for (const ch of buffer) {
-      handleInput(ch);
-    }
-    buffer = '';
+    readline.emitKeypressEvents(process.stdin);
+    process.stdin.setRawMode(true);
+    process.stdin.on('keypress', keypressHandler);
+
+    process.stdout.on('resize', () => { if (tuiRunning) render(); });
+    process.on('exit', cleanup);
+
     render();
-  });
-
-  process.stdout.on('resize', () => { render(); });
-  process.on('exit', cleanup);
-  process.on('SIGINT', () => { cleanup(); process.exit(0); });
-  process.on('SIGTERM', () => { cleanup(); process.exit(0); });
-
-  render();
+  } catch (err) {
+    for (const line of contentLines) {
+      console.log(line.text.replace(/\x1b\[[0-9;]*m/g, ''));
+    }
+  }
 }
 
 if (process.argv.includes('--help') || process.argv.includes('-h') || process.argv.includes('/?')) {
