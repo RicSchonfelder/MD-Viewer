@@ -7,3 +7,6 @@ src-tauri/gen/
 *.swp
 .DS_Store
 Thumbs.db
+
+# Code signing
+*.pfx

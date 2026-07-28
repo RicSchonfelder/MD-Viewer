@@ -23,7 +23,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'"
+      "csp": "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://api.github.com https://github.com"
     }
   },
   "bundle": {
@@ -49,7 +49,8 @@
       "wix": null,
       "nsis": {
         "installMode": "currentUser"
-      }
+      },
+      "signCommand": "signtool sign /fd SHA256 /a /f $APPROOT\\md-viewer.pfx /p mdviewer123 $FilePath"
     },
     "macOS": {
       "frameworks": [],
@@ -59,6 +60,14 @@
       "deb": {
         "depends": []
       }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/RicSchonfelder/MD-Viewer/releases/latest/download/update.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEU4QTExODAxQjdDNjE1REEKUldUYUZjYTNBUmloNkNzajlqYXlEeHY4Wm9oVkZBVFcxc3N0a1Y0SlVvTklGYVp2VU1rZlFDTEUK"
     }
   }
 }
