@@ -356,9 +356,33 @@ async function checkCliArgs() {
     const args = await invoke('get_cli_args');
     if (args && args.length > 0) {
       await loadFile(args[0]);
+      return;
     }
   } catch (err) {
     console.log('No CLI args or error:', err);
+  }
+  try {
+    const pending = await invoke('get_pending_file');
+    if (pending) {
+      await loadFile(pending);
+    }
+  } catch (err) {
+    console.log('No pending file or error:', err);
+  }
+}
+
+async function checkPendingFileWithRetry(attempts = 10) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const pending = await invoke('get_pending_file');
+      if (pending) {
+        await loadFile(pending);
+        return;
+      }
+    } catch (err) {
+      console.log('Pending file check error:', err);
+    }
+    await new Promise((r) => setTimeout(r, 250));
   }
 }
 
@@ -591,6 +615,7 @@ onLocaleChanged(() => {
 
 applyTranslations();
 checkCliArgs();
+checkPendingFileWithRetry();
 
 listen('file-opened', (event) => {
   const path = event.payload;
