@@ -31,12 +31,16 @@ fi
 
 # Fetch latest release
 RELEASE_JSON=$(curl -fsSL "$API_URL")
-TAG=$(echo "$RELEASE_JSON" | grep -o '"tag_name":"[^"]*"' | cut -d'"' -f4)
+TAG=$(echo "$RELEASE_JSON" | grep -oE '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4)
 echo -e "\033[32mLatest version: $TAG\033[0m"
+if [ -z "$TAG" ]; then
+  echo -e "\033[31mFailed to fetch latest version info.\033[0m" >&2
+  exit 1
+fi
 
 if [ "$OS" = "macos" ]; then
   ASSET_FILTER='.assets[] | select(.name | endswith(".dmg")) | .browser_download_url'
-  INSTALLER_URL=$(echo "$RELEASE_JSON" | grep -o '"browser_download_url":"[^"]*\.dmg"' | cut -d'"' -f4)
+  INSTALLER_URL=$(echo "$RELEASE_JSON" | grep -oE '"browser_download_url": *"[^"]*\.dmg"' | head -1 | cut -d'"' -f4)
   if [ -z "$INSTALLER_URL" ]; then
     echo -e "\033[31mNo macOS installer found in latest release.\033[0m" >&2
     exit 1
@@ -53,7 +57,7 @@ if [ "$OS" = "macos" ]; then
   echo -e "\033[32mMD Viewer $TAG installed to /Applications/MD Viewer.app\033[0m"
 elif [ "$OS" = "linux" ]; then
   # Try AppImage first, then deb
-  INSTALLER_URL=$(echo "$RELEASE_JSON" | grep -o '"browser_download_url":"[^"]*\.AppImage"' | cut -d'"' -f4)
+  INSTALLER_URL=$(echo "$RELEASE_JSON" | grep -oE '"browser_download_url": *"[^"]*\.AppImage"' | head -1 | cut -d'"' -f4)
   if [ -n "$INSTALLER_URL" ]; then
     DEST="$HOME/Applications/MD-Viewer.AppImage"
     mkdir -p "$HOME/Applications"
@@ -62,7 +66,7 @@ elif [ "$OS" = "linux" ]; then
     chmod +x "$DEST"
     echo -e "\033[32mMD Viewer $TAG installed to $DEST\033[0m"
   else
-    DEB_URL=$(echo "$RELEASE_JSON" | grep -o '"browser_download_url":"[^"]*\.deb"' | cut -d'"' -f4)
+    DEB_URL=$(echo "$RELEASE_JSON" | grep -oE '"browser_download_url": *"[^"]*\.deb"' | head -1 | cut -d'"' -f4)
     if [ -z "$DEB_URL" ]; then
       echo -e "\033[31mNo Linux installer found in latest release.\033[0m" >&2
       exit 1
