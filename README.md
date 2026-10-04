@@ -34,6 +34,7 @@
   - Double-click any `.md` file (file association)
   - Right-click → "Open with MD Viewer"
 - **Relative Path Resolution** — images and links relative to the Markdown file work out of the box
+- **Zoom & Pan** — `Ctrl` + scroll wheel to zoom (80%–200%), `Ctrl` + middle-click to reset, `Ctrl` + drag to pan
 - **Clean Interface** — distraction-free reading with a minimal toolbar
 - **Native Performance** — built on Tauri (WebView2 on Windows, WebKit on macOS/Linux)
 
@@ -78,6 +79,16 @@ curl -fsSL https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/master/ins
 | Open via drag & drop | Drag a `.md` file onto the window |
 | Toggle theme | Click **Theme** in the toolbar |
 | Open from terminal | `md-viewer path/to/file.md` |
+
+### Zoom & Pan
+
+| Action | How |
+|--------|-----|
+| Zoom in / out | `Ctrl` + mouse wheel (or `Ctrl +` / `Ctrl -`) |
+| Reset zoom to 100% | `Ctrl+0`, or `Ctrl` + click the mouse wheel button |
+| Pan the page | Hold `Ctrl` and drag with the left mouse button (hand cursor) |
+
+Zoom ranges from 80% to 200% and is remembered between sessions.
 
 ### Setting as Default Program
 

@@ -483,13 +483,16 @@ body {
   align-items: center;
   gap: 4px;
   justify-content: flex-end;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 #zoom-controls button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
+  width: auto;
+  min-width: 26px;
   height: 24px;
   border: 1px solid var(--border-subtle);
   border-radius: 4px;
@@ -501,6 +504,8 @@ body {
   line-height: 1;
   transition: all 0.12s;
   padding: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 #zoom-controls button:hover {
@@ -511,6 +516,12 @@ body {
 
 #zoom-controls button:active {
   opacity: 0.6;
+}
+
+#zoom-reset {
+  width: auto;
+  padding: 0 6px;
+  font-size: 11px;
 }
 
 #zoom-level {
@@ -555,6 +566,17 @@ body {
 
 #main-area::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+#main-area.pan-mode,
+#main-area.pan-mode * {
+  cursor: grab;
+}
+
+#main-area.panning,
+#main-area.panning * {
+  cursor: grabbing !important;
+  user-select: none;
 }
 
 /* ─── Sidebar ─── */

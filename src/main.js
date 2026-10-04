@@ -473,7 +473,7 @@ function buildToc() {
 
 // ─── Font Size / Zoom ───
 const ZOOM_MIN = 12;
-const ZOOM_MAX = 24;
+const ZOOM_MAX = 30;
 const ZOOM_DEFAULT = 15;
 
 let zoomLevel = ZOOM_DEFAULT;
@@ -507,6 +507,55 @@ applyZoom();
 document.getElementById('zoom-in').addEventListener('click', () => { toggleMenu(false); zoomIn(); });
 document.getElementById('zoom-out').addEventListener('click', () => { toggleMenu(false); zoomOut(); });
 document.getElementById('zoom-reset').addEventListener('click', () => { toggleMenu(false); zoomReset(); });
+
+// ─── Zoom: Ctrl+scroll, Ctrl+middle-click reset, Ctrl+drag pan ───
+const mainArea = document.getElementById('main-area');
+let panState = null;
+
+function setPanMode(on) {
+  mainArea.classList.toggle('pan-mode', on);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey || e.metaKey) setPanMode(true);
+});
+document.addEventListener('keyup', (e) => {
+  if (e.key === 'Control' || e.key === 'Meta') setPanMode(false);
+});
+window.addEventListener('blur', () => setPanMode(false));
+
+document.addEventListener('wheel', (e) => {
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+  if (e.deltaY > 0) zoomOut(); else zoomIn();
+}, { passive: false });
+
+document.addEventListener('mousedown', (e) => {
+  if (e.button === 1) e.preventDefault();
+  if (e.button !== 0 || !e.ctrlKey) return;
+  e.preventDefault();
+  panState = { x: e.clientX, y: e.clientY, left: mainArea.scrollLeft, top: mainArea.scrollTop };
+  mainArea.classList.add('panning');
+});
+document.addEventListener('mousemove', (e) => {
+  if (!panState) return;
+  mainArea.scrollLeft = panState.left - (e.clientX - panState.x);
+  mainArea.scrollTop = panState.top - (e.clientY - panState.y);
+  setPanMode(e.ctrlKey);
+});
+document.addEventListener('mouseup', (e) => {
+  if (e.button !== 0 || !panState) return;
+  panState = null;
+  mainArea.classList.remove('panning');
+  setPanMode(e.ctrlKey);
+});
+
+document.addEventListener('auxclick', (e) => {
+  if (e.button === 1 && e.ctrlKey) {
+    e.preventDefault();
+    zoomReset();
+  }
+});
 
 // ─── Drag & Drop ───
 let dragCounter = 0;
