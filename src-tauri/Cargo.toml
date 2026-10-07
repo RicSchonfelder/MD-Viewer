@@ -1,6 +1,6 @@
 [package]
 name = "md-viewer"
-version = "1.0.2"
+version = "1.0.3"
 description = "A cross-platform Markdown file viewer"
 authors = ["you"]
 edition = "2021"

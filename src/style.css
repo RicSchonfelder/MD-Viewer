@@ -570,12 +570,12 @@ body {
 
 #main-area.pan-mode,
 #main-area.pan-mode * {
-  cursor: grab;
+  cursor: url(./cursors/grab.png) 28 34, -webkit-grab, grab;
 }
 
 #main-area.panning,
 #main-area.panning * {
-  cursor: grabbing !important;
+  cursor: url(./cursors/grabbing.png) 22 40, -webkit-grabbing, grabbing !important;
   user-select: none;
 }
 
