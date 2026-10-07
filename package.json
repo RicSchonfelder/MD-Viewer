@@ -1,7 +1,7 @@
 {
   "name": "md-viewer",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A cross-platform Markdown file viewer - read-only, no editing",
   "type": "module",
   "bin": {
