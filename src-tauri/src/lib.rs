@@ -55,6 +55,7 @@ async fn download_and_install(url: String) -> Result<(), String> {
     Ok(())
 }
 
+#[cfg(target_os = "macos")]
 fn emit_file_opened(app: &tauri::AppHandle, path: &str) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.emit("file-opened", path);
@@ -90,7 +91,8 @@ pub fn run() {
         })
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
-        .run(|app_handle, event| {
+        .run(move |app_handle, event| {
+            #[cfg(target_os = "macos")]
             if let tauri::RunEvent::Opened { urls, .. } = event {
                 for url in urls {
                     let path = url.to_file_path().unwrap_or_default();
@@ -98,6 +100,11 @@ pub fn run() {
                     store_pending_file(path_str.clone());
                     emit_file_opened(app_handle, &path_str);
                 }
+            }
+
+            #[cfg(not(target_os = "macos"))]
+            {
+                let _ = (&app_handle, &event);
             }
         });
 }
