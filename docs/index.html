@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MD Viewer — Lightweight cross-platform Markdown viewer</title>
+  <meta name="description" content="MD Viewer is a lightweight, read-only, cross-platform desktop Markdown file viewer built with Tauri 2, Rust and JavaScript. Free and open source." />
+  <meta property="og:title" content="MD Viewer — Read Markdown. Nothing else." />
+  <meta property="og:description" content="A lightweight, read-only, cross-platform desktop Markdown viewer. Windows, macOS & Linux. ~2 MB. Open source." />
+  <meta property="og:image" content="https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/master/src-tauri/icons/icon.png" />
+  <meta property="og:url" content="https://ricschonfelder.github.io/MD-Viewer/" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/master/src-tauri/icons/icon.png" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="nav">
+    <div class="nav__inner container">
+      <a class="nav__brand" href="#top" aria-label="MD Viewer home">
+        <img src="https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/master/src-tauri/icons/icon.png" alt="" class="nav__icon" width="30" height="30" />
+        <span>MD&nbsp;Viewer</span>
+      </a>
+
+      <nav class="nav__links" id="nav-links" aria-label="Main">
+        <a href="#features" data-i18n="nav.features">Features</a>
+        <a href="#download" data-i18n="nav.download">Download</a>
+        <a href="#usage" data-i18n="nav.usage">Usage</a>
+        <a href="#tech" data-i18n="nav.tech">Tech</a>
+      </nav>
+
+      <div class="nav__actions">
+        <button class="pill-toggle" id="lang-toggle" aria-label="Switch language" title="Switch language">
+          <span data-lang="pt">PT</span><span data-lang="en">EN</span>
+          <span class="pill-toggle__thumb" aria-hidden="true"></span>
+        </button>
+        <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+        </button>
+        <a class="btn btn--ghost btn--sm nav__gh" href="https://github.com/RicSchonfelder/MD-Viewer" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          <span>GitHub</span>
+        </a>
+        <button class="hamburger" id="menu-btn" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="#features" data-i18n="nav.features">Features</a>
+      <a href="#download" data-i18n="nav.download">Download</a>
+      <a href="#usage" data-i18n="nav.usage">Usage</a>
+      <a href="#tech" data-i18n="nav.tech">Tech</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="container hero__grid">
+        <div class="hero__copy reveal">
+          <div class="hero__badges">
+            <span class="badge badge--dot"><span class="dot"></span><span id="release-version" data-i18n="hero.version">Latest release</span></span>
+            <span class="badge" data-i18n="hero.badgeSize">~2 MB · Free &amp; open source</span>
+          </div>
+          <h1 class="hero__title" data-i18n-html="hero.title">
+            Read Markdown.<br /><span class="grad">Nothing else.</span>
+          </h1>
+          <p class="hero__sub" data-i18n="hero.sub">
+            A lightweight, read-only desktop Markdown viewer for Windows, macOS and Linux.
+            Full GFM rendering, syntax highlighting and native performance — in an installer of ~2&nbsp;MB.
+          </p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="#download">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              <span data-i18n="hero.downloadBtn">Download free</span>
+            </a>
+            <a class="btn btn--ghost" href="https://github.com/RicSchonfelder/MD-Viewer" target="_blank" rel="noopener">
+              <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+              <span data-i18n="hero.sourceBtn">View source</span>
+            </a>
+          </div>
+          <ul class="hero__points">
+            <li data-i18n-html="hero.p1" class="hero__point"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Read-only — no editing, no distractions</li>
+            <li data-i18n-html="hero.p2" class="hero__point"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Windows, macOS &amp; Linux</li>
+            <li data-i18n-html="hero.p3" class="hero__point"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Dark &amp; light themes</li>
+          </ul>
+        </div>
+
+        <!-- Interactive mock window -->
+        <div class="hero__stage reveal" aria-hidden="true">
+          <div class="mock" id="mock">
+            <div class="mock__bar">
+              <span class="mock__dot"></span><span class="mock__dot"></span><span class="mock__dot"></span>
+              <span class="mock__title">RELEASE_NOTES.md</span>
+              <button class="mock__toggle" id="mock-toggle" tabindex="-1" data-i18n="mock.view">view</button>
+            </div>
+            <div class="mock__body" id="mock-body">
+              <!-- source view -->
+              <pre class="mock__src" id="mock-src"><code><span class="c-h"># Changelog</span>
+
+## <span class="c-h2">v1.4.0</span>
+
+- <span class="c-dash">-</span> [x] Feature: <span class="c-str">"fix: toast bug"</span>
+- <span class="c-dash">-</span> [x] Zoom <span class="c-em">80%–200%</span>
+- <span class="c-dash">-</span> [ ] Auto-update
+
+<span class="c-code">```rust</span>
+<span class="c-kw">fn</span> main() {
+    <span class="c-fn">viewer</span>.<span class="c-fn">open</span>(path);
+}
+<span class="c-code">```</span>
+
+&gt; <span class="c-q">Read-only. No editing.</span></code></pre>
+              <!-- rendered view -->
+              <div class="mock__render" id="mock-render" hidden>
+                <h3 style="margin:0 0 .6rem">Changelog</h3>
+                <hr style="border:0;border-top:1px solid var(--line);margin:0 0 .8rem" />
+                <p class="mock__h4">v1.4.0</p>
+                <ul class="mock__list">
+                  <li><span class="chk chk--done">✓</span> Feature: "fix: toast bug"</li>
+                  <li><span class="chk chk--done">✓</span> Zoom <strong>80%–200%</strong></li>
+                  <li><span class="chk">✓</span> Auto-update</li>
+                </ul>
+                <div class="mock__codeblock"><span class="mock__lang">rust</span><pre><code><span class="c-kw">fn</span> main() {
+    <span class="c-fn">viewer</span>.<span class="c-fn">open</span>(path);
+}</code></pre></div>
+                <blockquote class="mock__quote">Read-only. No editing.</blockquote>
+              </div>
+            </div>
+          </div>
+          <div class="hero__glow" aria-hidden="true"></div>
+          <button class="mock__hint-btn" id="mock-hint" data-i18n="mock.hint">Try me: toggle render →</button>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="stats reveal" id="stats">
+          <div class="stat"><span class="stat__n" data-count="30" data-suffix="k+">0</span><span class="stat__l" data-i18n="stat.lines">lines to big files</span></div>
+          <div class="stat"><span class="stat__n" data-count="2" data-suffix=" MB">0</span><span class="stat__l" data-i18n="stat.winSize">Windows installer</span></div>
+          <div class="stat"><span class="stat__n" data-count="3" data-suffix="">0</span><span class="stat__l" data-i18n="stat.platforms">platforms</span></div>
+          <div class="stat"><span class="stat__n" data-count="11" data-suffix="+">0</span><span class="stat__l" data-i18n="stat.langs">highlighted languages</span></div>
+        </div>
+      </div>
+      <div class="hero__wave" aria-hidden="true"></div>
+    </section>
+
+    <!-- ============ FEATURES ============ -->
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section__head reveal">
+          <span class="section__kicker" data-i18n="features.kicker">Features</span>
+          <h2 class="section__title" data-i18n-html="features.title">Everything you need to <span class="grad">read</span>, nothing you don't</h2>
+          <p class="section__sub" data-i18n="features.sub">Built for reading first — fast to open, pleasant to scroll, out of your way.</p>
+        </div>
+
+        <div class="features">
+          <article class="card reveal">
+            <div class="card__icon" data-hue="152">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
+            </div>
+            <h3 data-i18n="f1.t">Full GFM rendering</h3>
+            <p data-i18n="f1.d">Headings, tables, task lists, fenced code blocks, blockquotes, images and videos — rendered exactly as intended.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card__icon" data-hue="265">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 6-6 6 6 6M16 6l6 6-6 6M13 3l-3 18"/></svg>
+            </div>
+            <h3 data-i18n="f2.t">Syntax highlighting</h3>
+            <p data-i18n="f2.d">JavaScript, TypeScript, Python, Rust, Go, Bash, SQL, CSS, HTML/XML and JSON, out of the box.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card__icon" data-hue="215">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            </div>
+            <h3 data-i18n="f3.t">Dark &amp; light themes</h3>
+            <p data-i18n="f3.d">Auto-detects your system preference and lets you toggle anytime from the toolbar.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card__icon" data-hue="25">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2Zm3-13h7M7 13h7M7 17h4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+            </div>
+            <h3 data-i18n="f4.t">Open any way you like</h3>
+            <p data-i18n="f4.d">Ctrl+O, drag &amp; drop onto the window, file association (double-click) or right-click → "Open with MD Viewer".</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card__icon" data-hue="340">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V9m0 8 2-4M3 8h18"/></svg>
+            </div>
+            <h3 data-i18n="f5.t">Relative paths that work</h3>
+            <p data-i18n="f5.d">Images and links relative to the .md file resolve automatically — screenshots and assets just show up.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card__icon" data-hue="140">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" fill="none"/><path d="m21 21-4.35-4.35M8 11h6M11 8v6"/></svg>
+            </div>
+            <h3 data-i18n="f6.t">Zoom &amp; pan, remembered</h3>
+            <p data-i18n="f6.d">Ctrl+wheel from 80% to 200%, Ctrl+drag to pan. Your zoom level is kept between sessions.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card__icon" data-hue="200">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 5-4 14M17 3l4 4-4 4M7 17l-4-4 4-4"/></svg>
+            </div>
+            <h3 data-i18n="f7.t">Ghost-light &amp; fast</h3>
+            <p data-i18n="f7.d">A ~2 MB installer on Windows. Opens instantly, sits in the tray of your mind — barely there.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card__icon" data-hue="180">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h3 data-i18n="f8.t">Truly native</h3>
+            <p data-i18n="f8.d">Built on Tauri 2: WebView2 on Windows, native WebKit on macOS and Linux. No Electron bloat.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DOWNLOAD ============ -->
+    <section class="section section--alt" id="download">
+      <div class="container">
+        <div class="section__head reveal">
+          <span class="section__kicker" data-i18n="dl.kicker">Download</span>
+          <h2 class="section__title" data-i18n="dl.title2">Pick your platform</h2>
+          <p class="section__sub"><span data-i18n="dl.sub">Get the latest installer from the</span> <a href="https://github.com/RicSchonfelder/MD-Viewer/releases" target="_blank" rel="noopener">Releases <span data-i18n="dl.pages">page</span></a>.</p>
+        </div>
+
+        <div class="dl reveal">
+          <div class="cards" id="dl-cards">
+            <div class="card" id="dl-windows">
+              <div class="cards__head">
+                <div class="card__icon" data-hue="210"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 5.5 10.5 4.4v7.1H3V5.5Zm9-1.3L21 3v8.5h-9V4.2ZM3 18.5l7.5 1.1v-7.1H3v6Zm9 1.2 9 1.3v-8.5h-9v7.2Z"/></svg></div>
+                <h3>Windows</h3>
+                <span class="chip card__hot" data-i18n="dl.recommended">recommended</span>
+              </div>
+              <div class="dl__list">
+                <a class="dl__link" href="https://github.com/RicSchonfelder/MD-Viewer/releases/latest" target="_blank" rel="noopener"><span>.exe</span><small>NSIS · ~2 MB</small></a>
+                <a class="dl__link" href="https://github.com/RicSchonfelder/MD-Viewer/releases/latest" target="_blank" rel="noopener"><span>.msi</span><small>WiX · ~3 MB</small></a>
+              </div>
+              <p class="dl__note" data-i18n="dl.winNote">File associations and context menu are registered automatically.</p>
+            </div>
+
+            <div class="card" id="dl-macos">
+              <div class="cards__head">
+                <div class="card__icon" data-hue="0"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M16.4 12.7c0-2.4 2-3.6 2-3.6s-1.1-1.8-3.3-1.8c-1 0-2 .5-2.6.5-.7 0-1.6-.5-2.7-.5-2 0-4 2.2-4 5.2 0 2.9 2.1 6.5 3.7 6.5.8 0 1.6-.6 2.9-.6 1.2 0 2 .6 3 .6 1.6 0 3.3-2.9 3.6-4-.1 0-2.6-.8-2.6-3.3ZM14.4 5c.9-1 1.3-2 1.3-3-1.2.1-2.5.6-3.3 1.4-.7.8-1.3 2-1.2 3 1.3.1 2.5-.6 3.2-1.4Z"/></svg></div>
+                <h3>macOS</h3>
+              </div>
+              <div class="dl__list">
+                <a class="dl__link" href="https://github.com/RicSchonfelder/MD-Viewer/releases/latest" target="_blank" rel="noopener"><span>.dmg</span><small>~5 MB</small></a>
+              </div>
+              <p class="dl__note" data-i18n="dl.macNote">Mount the .dmg and drag MD Viewer to Applications.</p>
+            </div>
+
+            <div class="card" id="dl-linux">
+              <div class="cards__head">
+                <div class="card__icon" data-hue="160"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2c-1.4 0-2.5 1.2-2.6 3-.1 1.5-.6 2.2-1.9 3.7C6.2 10.2 5 12 5 14.2c0 .9-.7 2.1-1.4 3.1-.7 1-1.4 2-.9 2.6.4.5 1.5.1 2.8.1 1.2 0 2 .6 3 .6.9 0 2.2-.3 3.5-.3s2.6.3 3.5.3c1 0 1.8-.6 3-.6 1.3 0 2.4.4 2.8-.1.5-.6-.2-1.6-.9-2.6-.7-1-1.4-2.2-1.4-3.1 0-2.2-1.2-4-2.5-5.5-1.3-1.5-1.8-2.2-1.9-3.7C14.5 3.2 13.4 2 12 2Zm-2 5.4c.4 0 .8.5.8 1s-.4 1-.8 1-.8-.5-.8-1 .4-1 .8-1Zm4 0c.4 0 .8.5.8 1s-.4 1-.8 1-.8-.5-.8-1 .4-1 .8-1Z"/></svg></div>
+                <h3>Linux</h3>
+              </div>
+              <div class="dl__list">
+                <a class="dl__link" href="https://github.com/RicSchonfelder/MD-Viewer/releases/latest" target="_blank" rel="noopener"><span>.AppImage</span><small>~5 MB</small></a>
+                <a class="dl__link" href="https://github.com/RicSchonfelder/MD-Viewer/releases/latest" target="_blank" rel="noopener"><span>.deb</span><small>~3 MB</small></a>
+              </div>
+              <p class="dl__note" data-i18n="dl.linuxNote">chmod +x the AppImage, run it, or sudo dpkg -i the .deb.</p>
+            </div>
+          </div>
+
+          <div class="codebox reveal">
+            <div class="codebox__head">
+              <span data-i18n="dl.oneliner">One-liner install</span>
+              <div class="codebox__tabs">
+                <button class="codebox__tab is-active" data-cmd="pwsh" data-i18n="dl.pwshTab">PowerShell</button>
+                <button class="codebox__tab" data-cmd="bash" data-i18n="dl.bashTab">Bash</button>
+              </div>
+            </div>
+            <div class="codebox__body">
+              <code id="one-liner">irm https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/master/install.ps1 | iex</code>
+              <button class="copy-btn" id="copy-cmd" aria-label="Copy command">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span data-i18n="copy">Copy</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ USAGE ============ -->
+    <section class="section" id="usage">
+      <div class="container">
+        <div class="section__head reveal">
+          <span class="section__kicker" data-i18n="usage.kicker">Usage</span>
+          <h2 class="section__title" data-i18n="usage.title2">Keyboard-first, mouse-friendly</h2>
+        </div>
+
+        <div class="usage">
+          <div class="usage__col reveal">
+            <h3 data-i18n="usage.actions">Actions</h3>
+            <ul class="klist">
+              <li><span data-i18n="u1.a">Open a file</span><span class="keys"><kbd>Ctrl</kbd><kbd>O</kbd></span></li>
+              <li><span data-i18n="u2.a">Toggle theme</span><span class="keys" data-i18n="u2.k">toolbar button</span></li>
+              <li><span data-i18n="u3.a">Open from terminal</span><span class="keys"><code>md-viewer file.md</code></span></li>
+              <li><span data-i18n="u4.a">Set as default</span><span class="keys" data-i18n="u4.k">right-click → open with</span></li>
+            </ul>
+          </div>
+          <div class="usage__col reveal">
+            <h3 data-i18n="usage.zoom">Zoom &amp; pan</h3>
+            <ul class="klist">
+              <li><span data-i18n="u5.a">Zoom in / out</span><span class="keys"><kbd>Ctrl</kbd>+<kbd>wheel</kbd></span></li>
+              <li><span data-i18n="u6.a">Reset to 100%</span><span class="keys"><kbd>Ctrl</kbd><kbd>0</kbd></span></li>
+              <li><span data-i18n="u7.a">Pan the page</span><span class="keys"><kbd>Ctrl</kbd>+<kbd>drag</kbd></span></li>
+              <li><span data-i18n="u8.a">Range</span><span class="keys">80% – 200%</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TECH ============ -->
+    <section class="section section--alt" id="tech">
+      <div class="container">
+        <div class="section__head reveal">
+          <span class="section__kicker" data-i18n="tech.kicker">Tech stack</span>
+          <h2 class="section__title" data-i18n="tech.title2">Built like a feather</h2>
+          <p class="section__sub" data-i18n="tech.sub">Rust where it counts, web tech where it shines. The Tauri v2 shell keeps the package tiny and memory low.</p>
+        </div>
+
+        <div class="stack reveal">
+          <div class="stack__item"><span class="stack__n">Tauri 2</span><small class="stack__d" data-i18n="s1.d">app shell</small></div>
+          <div class="stack__item"><span class="stack__n">Rust</span><small class="stack__d" data-i18n="s2.d">core + bundling</small></div>
+          <div class="stack__item"><span class="stack__n">JavaScript</span><small class="stack__d" data-i18n="s3.d">renderer</small></div>
+          <div class="stack__item"><span class="stack__n">Vite</span><small class="stack__d" data-i18n="s4.d">build tool</small></div>
+          <div class="stack__item"><span class="stack__n">WebView2 / WebKit</span><small class="stack__d" data-i18n="s5.d">native webview</small></div>
+        </div>
+
+        <div class="build reveal">
+          <div class="codebox codebox--static">
+            <div class="codebox__head"><span data-i18n="tech.build">Build from source</span></div>
+            <div class="codebox__body">
+              <code id="build-cmd">git clone https://github.com/RicSchonfelder/MD-Viewer.git && cd MD-Viewer && npm install && npm run tauri build</code>
+              <button class="copy-btn" id="copy-build" aria-label="Copy build command">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span data-i18n="copy">Copy</span>
+              </button>
+            </div>
+          </div>
+          <p class="build__req"><strong data-i18n="tech.req">Prerequisites:</strong> <span data-i18n="tech.reqTxt">Node.js 20+, Rust 1.77+, Tauri v2 system dependencies. Artifacts go to src-tauri/target/release/bundle/.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA ============ -->
+    <section class="cta">
+      <div class="container reveal">
+        <h2 data-i18n="cta.title">Your .md files deserve a reader.</h2>
+        <p data-i18n="cta.sub">Free, open source and ~2 MB. What are you waiting for?</p>
+        <a class="btn btn--primary btn--lg" href="https://github.com/RicSchonfelder/MD-Viewer/releases/latest" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          <span data-i18n="cta.btn">Download MD Viewer</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img src="https://raw.githubusercontent.com/RicSchonfelder/MD-Viewer/master/src-tauri/icons/icon.png" alt="" width="26" height="26" />
+        <span>MD Viewer</span>
+      </div>
+      <p class="footer__copy"><span data-i18n="footer.made">Built with</span> Tauri 2, Rust &amp; JavaScript · <span data-i18n="footer.open">Open source</span> · MIT</p>
+      <div class="footer__links">
+        <a href="https://github.com/RicSchonfelder/MD-Viewer" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/RicSchonfelder/MD-Viewer/releases" target="_blank" rel="noopener" data-i18n="footer.releases">Releases</a>
+        <a href="https://github.com/RicSchonfelder/MD-Viewer/issues" target="_blank" rel="noopener" data-i18n="footer.issues">Issues</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
